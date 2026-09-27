@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#FFF7EC">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Bhalu — Urdu Speaking Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FFF7EC; --cream2:#FFEFD9; --ink:#3A2E2A; --ink-soft:#7A6A63;
+  --coral:#FF6B6B; --coral-d:#E85555; --teal:#2EC4B6; --teal-d:#1FA79A;
+  --sun:#FFD93D; --plum:#7C5CBF; --plum-d:#6A4FAD; --pink:#FF9EBB;
+  --card:#FFFFFF; --shadow:0 8px 24px rgba(58,46,42,.10);
+  --r:24px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:"Baloo 2",ui-rounded,"SF Pro Rounded",system-ui,sans-serif;
+  background:var(--cream); color:var(--ink);
+  min-height:100dvh; overflow-x:hidden;
+  background-image:radial-gradient(circle at 12% 8%, #FFE9C7 0 90px, transparent 91px),
+                   radial-gradient(circle at 88% 22%, #D8F7F3 0 70px, transparent 71px),
+                   radial-gradient(circle at 78% 88%, #FFE3EC 0 100px, transparent 101px),
+                   radial-gradient(circle at 8% 80%, #FFF3C4 0 80px, transparent 81px);
+  background-attachment:fixed;
+}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit}
+input{font-family:inherit}
+
+/* ---------- screens ---------- */
+.screen{display:none; min-height:100dvh; padding:20px 18px calc(28px + env(safe-area-inset-bottom)); max-width:520px; margin:0 auto; animation:pop .35s ease}
+.screen.on{display:block}
+@keyframes pop{from{opacity:0; transform:translateY(14px) scale(.99)} to{opacity:1; transform:none}}
+@keyframes floaty{0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)}}
+@keyframes wiggle{0%,100%{transform:rotate(-2deg)} 50%{transform:rotate(2deg)}}
+
+/* ---------- type & buttons ---------- */
+h1{font-size:34px; font-weight:800; letter-spacing:-.5px}
+h2{font-size:24px; font-weight:800}
+.sub{color:var(--ink-soft); font-size:16px; font-weight:600}
+.center{text-align:center}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  background:var(--coral); color:#fff; font-weight:800; font-size:19px;
+  padding:15px 34px; border-radius:999px; box-shadow:0 6px 0 var(--coral-d), var(--shadow);
+  transition:transform .12s, box-shadow .12s; border:none; width:100%;
+}
+.btn:active{transform:translateY(4px); box-shadow:0 2px 0 var(--coral-d)}
+.btn.teal{background:var(--teal); box-shadow:0 6px 0 var(--teal-d), var(--shadow)}
+.btn.teal:active{box-shadow:0 2px 0 var(--teal-d)}
+.btn.plum{background:var(--plum); box-shadow:0 6px 0 var(--plum-d), var(--shadow)}
+.btn.plum:active{box-shadow:0 2px 0 var(--plum-d)}
+.btn.ghost{background:#fff; color:var(--ink); box-shadow:0 4px 0 #EAD9C2, var(--shadow); font-size:16px; padding:12px 24px}
+.btn.ghost:active{box-shadow:0 1px 0 #EAD9C2}
+.btn.small{font-size:15px; padding:10px 20px; width:auto}
+
+/* ---------- bhalu ---------- */
+.bhalu-stage{display:flex; justify-content:center; padding:6px 0 2px}
+#bhalu-svg{width:172px; height:172px; overflow:visible}
+#bhalu-svg .bob{animation:bob 2.6s ease-in-out infinite; transform-origin:50% 90%}
+@keyframes bob{0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)}}
+#bhalu-svg.m-cheer .bob{animation:cheer .55s ease-in-out infinite}
+@keyframes cheer{0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-16px) rotate(3deg)}}
+#bhalu-svg.m-nervous .bob{animation:nervous .3s linear infinite}
+@keyframes nervous{0%,100%{transform:translateX(-4px) rotate(-4deg)} 50%{transform:translateX(4px) rotate(4deg)}}
+#bhalu-svg.m-celebrate .bob{animation:celebrate .7s ease-in-out infinite}
+@keyframes celebrate{0%,100%{transform:translateY(0) scale(1)} 30%{transform:translateY(-20px) scale(1.05) rotate(-4deg)} 60%{transform:translateY(-20px) scale(1.05) rotate(4deg)}}
+#bhalu-svg.m-listen .ear{animation:perk .5s ease-in-out infinite alternate; transform-origin:center bottom}
+@keyframes perk{from{transform:scale(1)} to{transform:scale(1.18)}}
+#bhalu-svg.m-thinking .bob{animation:think 1.4s ease-in-out infinite}
+@keyframes think{0%,100%{transform:rotate(-6deg)} 50%{transform:rotate(6deg)}}
+#bhalu-svg .blink{animation:blink 4.2s infinite; transform-origin:center; transform-box:fill-box}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)} 95%,97%{transform:scaleY(.08)}}
+.party-hat{display:none}
+.m-celebrate .party-hat{display:block; animation:wiggle 1s ease-in-out infinite; transform-origin:50% 100%}
+
+/* ---------- cards ---------- */
+.card{background:var(--card); border-radius:var(--r); box-shadow:var(--shadow); padding:18px; margin:14px 0}
+.card h2{margin-bottom:4px}
+.row{display:flex; gap:10px; align-items:center}
+.spread{justify-content:space-between}
+
+/* scenario grid */
+.scn-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px}
+.scn{
+  background:#fff; border:3px solid transparent; border-radius:20px; padding:14px 10px;
+  box-shadow:var(--shadow); text-align:center; transition:transform .12s, border-color .12s;
+}
+.scn:active{transform:scale(.96)}
+.scn.sel{border-color:var(--coral); background:#FFF1EF}
+.scn .e{font-size:34px; display:block}
+.scn .t{font-weight:800; font-size:15px; margin-top:4px; display:block}
+.scn .d{font-size:12px; color:var(--ink-soft); font-weight:600; line-height:1.35; margin-top:2px}
+
+/* segmented difficulty */
+.seg{display:flex; background:#F3E9D8; border-radius:999px; padding:5px; gap:4px; margin-top:10px}
+.seg button{flex:1; padding:10px 0; border-radius:999px; font-weight:800; font-size:15px; color:var(--ink-soft); transition:all .15s}
+.seg button.sel{background:#fff; color:var(--ink); box-shadow:0 3px 8px rgba(58,46,42,.15)}
+.seg button small{display:block; font-size:11px; font-weight:600}
+
+/* slider */
+input[type=range]{-webkit-appearance:none; width:100%; height:12px; border-radius:999px; background:linear-gradient(90deg,var(--teal),var(--sun)); outline:none; margin:14px 0 6px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:34px; height:34px; border-radius:50%; background:#fff; border:4px solid var(--coral); box-shadow:var(--shadow); cursor:pointer}
+input[type=range]::-moz-range-thumb{width:28px; height:28px; border-radius:50%; background:#fff; border:4px solid var(--coral); cursor:pointer}
+.slider-val{font-size:26px; font-weight:800; color:var(--coral)}
+
+/* toggle */
+.toggle{position:relative; width:62px; height:34px; background:#E7DCC8; border-radius:999px; transition:background .2s; flex:none}
+.toggle::after{content:""; position:absolute; top:4px; left:4px; width:26px; height:26px; border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.2); transition:left .2s}
+.toggle.on{background:var(--teal)}
+.toggle.on::after{left:32px}
+
+/* ---------- session ---------- */
+.sess-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px}
+.pill{background:#fff; border-radius:999px; padding:8px 16px; font-weight:800; box-shadow:var(--shadow); font-size:15px; display:inline-flex; align-items:center; gap:6px}
+#sess-timer{font-variant-numeric:tabular-nums; color:var(--coral)}
+.icon-btn{background:#fff; border-radius:50%; width:46px; height:46px; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); font-size:20px; flex:none}
+.icon-btn:active{transform:scale(.93)}
+#chat-log{display:flex; flex-direction:column; gap:10px; margin:12px 0; max-height:30dvh; overflow-y:auto; padding:4px 2px}
+#scr-session #bhalu-svg2{width:118px; height:118px}
+#scr-session .bhalu-stage{padding:0}
+.bubble{max-width:82%; padding:11px 15px; border-radius:20px; font-size:16px; font-weight:600; line-height:1.5; box-shadow:0 3px 10px rgba(58,46,42,.08); animation:pop .25s ease}
+.bubble.partner{background:#fff; align-self:flex-start; border-bottom-left-radius:8px}
+.bubble.partner .who{font-size:11px; color:var(--teal-d); font-weight:800; display:block; margin-bottom:2px}
+.bubble.user{background:var(--teal); color:#fff; align-self:flex-end; border-bottom-right-radius:8px}
+.bubble .tr{font-size:12px; opacity:.75; margin-top:4px; font-weight:600}
+#typing{display:none; align-self:flex-start; background:#fff; border-radius:20px; padding:12px 18px; box-shadow:var(--shadow)}
+#typing.on{display:block}
+#typing span{display:inline-block; width:9px; height:9px; margin:0 2px; background:var(--ink-soft); border-radius:50%; animation:tp 1s infinite}
+#typing span:nth-child(2){animation-delay:.15s} #typing span:nth-child(3){animation-delay:.3s}
+@keyframes tp{0%,100%{transform:translateY(0); opacity:.5} 50%{transform:translateY(-6px); opacity:1}}
+#status-line{text-align:center; font-weight:800; color:var(--ink-soft); min-height:28px; font-size:15px; margin:4px 0 10px}
+.mic-zone{display:flex; flex-direction:column; align-items:center; gap:8px; padding-bottom:8px}
+.mic-wrap{position:relative; width:118px; height:118px}
+#mic-btn{
+  width:118px; height:118px; border-radius:50%; background:var(--coral); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 8px 0 var(--coral-d), 0 12px 28px rgba(255,107,107,.4);
+  transition:transform .12s, box-shadow .12s; position:relative; z-index:2;
+}
+#mic-btn:active{transform:translateY(5px) scale(.97); box-shadow:0 3px 0 var(--coral-d)}
+#mic-btn svg{width:46px; height:46px}
+#mic-btn.listening{background:var(--teal); box-shadow:0 8px 0 var(--teal-d), 0 0 0 0 rgba(46,196,182,.5); animation:pulse 1.4s infinite}
+@keyframes pulse{0%{box-shadow:0 8px 0 var(--teal-d), 0 0 0 0 rgba(46,196,182,.45)} 70%{box-shadow:0 8px 0 var(--teal-d), 0 0 0 26px rgba(46,196,182,0)} 100%{box-shadow:0 8px 0 var(--teal-d), 0 0 0 0 rgba(46,196,182,0)}}
+#mic-btn.busy{background:var(--plum); box-shadow:0 8px 0 var(--plum-d)}
+#pressure-ring{position:absolute; inset:-10px; z-index:1; transform:rotate(-90deg); display:none}
+#pressure-ring.on{display:block}
+#pressure-ring .bg{stroke:#F0E4D0}
+#pressure-ring .fg{stroke:var(--coral); stroke-linecap:round; transition:stroke-dashoffset .2s linear}
+.mic-hint{font-size:13px; color:var(--ink-soft); font-weight:700}
+
+/* ---------- report ---------- */
+.score-wrap{display:flex; justify-content:center; margin:8px 0}
+#score-ring{transform:rotate(-90deg)}
+#score-ring .fg{stroke:var(--teal); stroke-linecap:round; transition:stroke-dashoffset 1.2s ease}
+.score-num{font-size:44px; font-weight:800}
+.stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px}
+.stat{background:var(--cream2); border-radius:18px; padding:12px; text-align:center}
+.stat .v{font-size:24px; font-weight:800}
+.stat .l{font-size:12px; font-weight:700; color:var(--ink-soft)}
+.corr{background:#FFF1EF; border-radius:14px; padding:10px 12px; margin:8px 0; font-size:14px}
+.corr .w{color:var(--coral-d); font-weight:800; text-decoration:line-through}
+.corr .r{color:var(--teal-d); font-weight:800}
+.corr .e{color:var(--ink-soft); font-size:13px; margin-top:2px}
+#confetti{position:fixed; inset:0; pointer-events:none; z-index:99; overflow:hidden}
+.cf{position:absolute; top:-20px; width:10px; height:16px; border-radius:3px; animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg)}}
+#levelup-box{display:none; background:linear-gradient(135deg,#FFF3C4,#FFE3EC); border:3px dashed var(--plum); border-radius:20px; padding:14px; margin:14px 0; text-align:center; animation:pop .4s ease}
+#levelup-box.on{display:block}
+
+/* trends */
+.trend{background:#fff; border-radius:16px; padding:12px; margin:8px 0; box-shadow:var(--shadow)}
+.trend .t{font-weight:800; font-size:14px; margin-bottom:6px}
+.trend svg{width:100%; height:64px; display:block}
+.empty-note{text-align:center; color:var(--ink-soft); font-weight:700; padding:18px 8px; font-size:14px}
+
+/* setup */
+.key-input{width:100%; padding:14px 16px; border-radius:16px; border:3px solid #EAD9C2; font-size:15px; font-weight:600; outline:none; margin:10px 0; background:#fff}
+.key-input:focus{border-color:var(--teal)}
+.msg{min-height:24px; font-weight:700; font-size:14px; margin:6px 0; text-align:center}
+.msg.err{color:var(--coral-d)} .msg.ok{color:var(--teal-d)}
+.linklike{color:var(--plum); font-weight:800; text-decoration:underline; font-size:15px}
+
+/* misc */
+.warn{background:#FFF3C4; border-radius:16px; padding:12px 14px; font-size:14px; font-weight:700; color:#8a6d1a; margin:12px 0; display:none}
+.warn.on{display:block}
+.tiny{font-size:12px; color:var(--ink-soft); font-weight:600; text-align:center; margin-top:10px; line-height:1.5}
+.mt{margin-top:14px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- ================= WELCOME ================= -->
+<div class="screen on" id="scr-welcome">
+  <div class="bhalu-stage" style="margin-top:26px">
+    <svg id="bhalu-svg" class="m-cheer" viewBox="0 0 200 200" aria-label="Bhalu the bear"></svg>
+  </div>
+  <h1 class="center">Bhalu 🐻</h1>
+  <p class="sub center" style="margin:6px 0 4px">your Urdu speaking coach</p>
+  <div class="card">
+    <p style="font-weight:700; font-size:16px; line-height:1.55">You already <b>understand</b> Urdu. Bhalu trains you to <b>speak</b> it — fast, natural, and without translating in your head. Real voice conversations, real pressure, real progress. 🎙️</p>
+  </div>
+  <button class="btn" id="btn-start-welcome">Start practicing 🚀</button>
+  <p class="tiny">You'll need a free Gemini API key (2 min setup).<br>Your key never leaves your phone.</p>
+</div>
+
+<!-- ================= SETUP ================= -->
+<div class="screen" id="scr-setup">
+  <h2 class="center" style="margin-top:10px">One quick setup 🔑</h2>
+  <p class="sub center" style="margin:6px 0 2px">Bhalu's brain runs on Google's free Gemini API.<br>Paste your key once — it's saved on this phone only.</p>
+  <div class="card">
+    <label style="font-weight:800; font-size:15px">Gemini API key</label>
+    <input class="key-input" id="inp-key" type="password" placeholder="AIza..." autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div class="msg" id="setup-msg"></div>
+    <button class="btn teal" id="btn-save-key">Save &amp; continue ✅</button>
+    <p class="center" style="margin-top:12px"><button class="linklike" id="btn-get-key">Get a free key at aistudio.google.com ↗</button></p>
+  </div>
+  <button class="btn ghost mt" id="btn-back-setup">← Back</button>
+  <div class="warn" id="setup-warn"></div>
+</div>
+
+<!-- ================= HOME ================= -->
+<div class="screen" id="scr-home">
+  <div class="row spread" style="margin-top:6px">
+    <div>
+      <h2>Assalam-o-Alaikum! 👋</h2>
+      <p class="sub">What shall we practice today?</p>
+    </div>
+    <button class="icon-btn" id="btn-settings" title="API key">🔑</button>
+  </div>
+
+  <div class="card">
+    <div class="row spread"><h2>Pick a scenario 🎭</h2><button class="btn small plum" id="btn-surprise">🎲 Surprise me</button></div>
+    <div class="scn-grid" id="scenario-grid"></div>
+  </div>
+
+  <div class="card">
+    <h2>Difficulty 🎚️</h2>
+    <div class="seg" id="diff-seg">
+      <button data-d="easy" class="sel">Easy<small>slow &amp; simple</small></button>
+      <button data-d="medium">Medium<small>natural pace</small></button>
+      <button data-d="hard">Hard<small>fast &amp; spicy</small></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row spread"><h2>Session length ⏱️</h2><span class="slider-val"><span id="slider-val">10</span> min</span></div>
+    <input type="range" id="slider-min" min="3" max="20" value="10" step="1">
+  </div>
+
+  <div class="card">
+    <div class="row spread">
+      <div><h2>Pressure mode 🔥</h2><p class="sub" style="font-size:13px">A timer counts down every turn.<br>Bhalu won't wait for you!</p></div>
+      <button class="toggle" id="toggle-pressure" aria-label="pressure mode"></button>
+    </div>
+  </div>
+
+  <button class="btn" id="btn-start-session">Let's talk! 🎙️</button>
+  <button class="btn ghost mt" id="btn-voice-test">🔊 Hear Bhalu's voice</button>
+  <div class="warn" id="home-warn"></div>
+
+  <div class="card">
+    <div class="row spread"><h2>Your progress 📈</h2><span class="pill" id="history-count" style="font-size:13px">0 sessions</span></div>
+    <div id="trends-box"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn ghost small" id="btn-export">⬇️ Backup</button>
+      <button class="btn ghost small" id="btn-import">⬆️ Restore</button>
+      <input type="file" id="file-import" accept="application/json" class="hidden">
+    </div>
+  </div>
+</div>
+
+<!-- ================= SESSION ================= -->
+<div class="screen" id="scr-session">
+  <div class="sess-head">
+    <span class="pill" id="sess-scenario">🎭 Scenario</span>
+    <span class="pill" id="sess-timer">10:00</span>
+    <button class="icon-btn" id="btn-end-session" title="End session">✖️</button>
+  </div>
+  <div class="bhalu-stage"><svg id="bhalu-svg2" viewBox="0 0 200 200" aria-label="Bhalu"></svg></div>
+  <div id="chat-log"></div>
+  <div id="typing"><span></span><span></span><span></span></div>
+  <div id="status-line">Get ready…</div>
+  <div class="mic-zone">
+    <div class="mic-wrap">
+      <svg id="pressure-ring" viewBox="0 0 140 140">
+        <circle class="bg" cx="70" cy="70" r="62" fill="none" stroke-width="9"/>
+        <circle class="fg" id="pressure-fg" cx="70" cy="70" r="62" fill="none" stroke-width="9" stroke-dasharray="389.5" stroke-dashoffset="0"/>
+      </svg>
+      <button id="mic-btn" aria-label="microphone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3" fill="#fff" stroke="none"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="17" x2="12" y2="22"/></svg>
+      </button>
+    </div>
+    <div class="mic-hint" id="mic-hint">tap to barge in while Bhalu speaks</div>
+  </div>
+</div>
+
+<!-- ================= REPORT ================= -->
+<div class="screen" id="scr-report">
+  <div id="confetti"></div>
+  <div class="bhalu-stage"><svg id="bhalu-svg3" class="m-celebrate" viewBox="0 0 200 200" aria-label="Bhalu celebrating"></svg></div>
+  <h2 class="center">Session complete! 🎉</h2>
+  <p class="sub center" id="report-scenario-line"></p>
+  <div class="score-wrap">
+    <div style="position:relative; width:150px; height:150px">
+      <svg id="score-ring" viewBox="0 0 150 150" style="width:150px;height:150px">
+        <circle cx="75" cy="75" r="64" fill="none" stroke="#F0E4D0" stroke-width="14"/>
+        <circle class="fg" id="score-fg" cx="75" cy="75" r="64" fill="none" stroke-width="14" stroke-dasharray="402" stroke-dashoffset="402"/>
+      </svg>
+      <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center">
+        <span class="score-num" id="score-num">–</span>
+        <span style="font-size:12px; font-weight:800; color:var(--ink-soft)">FLUENCY</span>
+      </div>
+    </div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat"><div class="v" id="stat-rt">–</div><div class="l">avg response time</div></div>
+    <div class="stat"><div class="v" id="stat-en">–</div><div class="l">english words</div></div>
+    <div class="stat"><div class="v" id="stat-freeze">–</div><div class="l">freezes 🥶</div></div>
+    <div class="stat"><div class="v" id="stat-filler">–</div><div class="l">filler words</div></div>
+  </div>
+  <div class="card" id="report-card-body">
+    <h2>What Bhalu noticed 🔍</h2>
+    <p style="font-weight:700; font-size:15px; margin:8px 0" id="report-summary"></p>
+    <div id="en-examples"></div>
+    <div id="corrections-list" style="margin-top:8px"></div>
+    <div class="corr" style="background:#F0FBF9"><b>💡 Bhalu's tip:</b> <span id="report-tip"></span></div>
+  </div>
+  <div id="levelup-box">
+    <div style="font-size:40px">🐻⬆️</div>
+    <h2 id="levelup-text">Bhalu thinks you're ready for Medium!</h2>
+    <button class="btn plum mt" id="btn-levelup">Level me up! 🚀</button>
+  </div>
+  <button class="btn mt" id="btn-again">Practice again 🎙️</button>
+  <button class="btn ghost mt" id="btn-home2">← Home</button>
+</div>
+
+</body>
+<script>
+"use strict";
+/* ================= helpers ================= */
+const $=id=>document.getElementById(id);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ================= storage ================= */
+const store={
+  get key(){try{return localStorage.getItem("bhalu_key")||""}catch(e){return""}},
+  set key(v){try{localStorage.setItem("bhalu_key",v)}catch(e){}},
+  get history(){try{return JSON.parse(localStorage.getItem("bhalu_history_v1")||"[]")}catch(e){return[]}},
+  set history(h){try{localStorage.setItem("bhalu_history_v1",JSON.stringify(h))}catch(e){}},
+  get prefs(){try{return JSON.parse(localStorage.getItem("bhalu_prefs")||"{}")}catch(e){return{}}},
+  set prefs(p){try{localStorage.setItem("bhalu_prefs",JSON.stringify(p))}catch(e){}}
+};
+
+/* ================= Bhalu SVG ================= */
+function bhaluInner(){
+  // fluffy tufts around body
+  let tufts="";
+  for(let i=0;i<12;i++){
+    const a=(i/12)*Math.PI*2, x=100+Math.cos(a)*64, y=114+Math.sin(a)*62;
+    tufts+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="13" fill="#8A5A36"/>`;
+  }
+  return `
+  <g class="party-hat"><polygon points="100,18 82,52 118,52" fill="#7C5CBF"/><circle cx="100" cy="16" r="7" fill="#FFD93D"/><circle cx="91" cy="38" r="3.4" fill="#FFD93D"/><circle cx="109" cy="38" r="3.4" fill="#FF6B6B"/><circle cx="100" cy="47" r="3.4" fill="#2EC4B6"/></g>
+  <g class="bob">
+    ${tufts}
+    <g class="ear"><circle cx="56" cy="52" r="21" fill="#9C6B43"/><circle cx="56" cy="52" r="10" fill="#F5E3C8"/></g>
+    <g class="ear"><circle cx="144" cy="52" r="21" fill="#9C6B43"/><circle cx="144" cy="52" r="10" fill="#F5E3C8"/></g>
+    <ellipse cx="42" cy="122" rx="12" ry="21" fill="#9C6B43" transform="rotate(14 42 122)"/>
+    <ellipse cx="158" cy="122" rx="12" ry="21" fill="#9C6B43" transform="rotate(-14 158 122)"/>
+    <circle cx="100" cy="114" r="62" fill="#9C6B43"/>
+    <ellipse cx="100" cy="134" rx="37" ry="30" fill="#F5E3C8"/>
+    <ellipse cx="72" cy="172" rx="17" ry="12" fill="#9C6B43"/>
+    <ellipse cx="128" cy="172" rx="17" ry="12" fill="#9C6B43"/>
+    <ellipse cx="72" cy="172" rx="8" ry="6" fill="#F5E3C8"/>
+    <ellipse cx="128" cy="172" rx="8" ry="6" fill="#F5E3C8"/>
+    <ellipse cx="100" cy="120" rx="27" ry="21" fill="#F5E3C8"/>
+    <g class="blink">
+      <circle cx="78" cy="90" r="11.5" fill="#fff"/><circle cx="122" cy="90" r="11.5" fill="#fff"/>
+      <circle cx="79.5" cy="91.5" r="5.6" fill="#3A2E2A"/><circle cx="123.5" cy="91.5" r="5.6" fill="#3A2E2A"/>
+      <circle cx="81.5" cy="89.5" r="2" fill="#fff"/><circle cx="125.5" cy="89.5" r="2" fill="#fff"/>
+    </g>
+    <ellipse cx="62" cy="108" rx="9" ry="6" fill="#FF9EBB" opacity=".65"/>
+    <ellipse cx="138" cy="108" rx="9" ry="6" fill="#FF9EBB" opacity=".65"/>
+    <ellipse cx="100" cy="112" rx="9.5" ry="7.5" fill="#3A2E2A"/>
+    <path d="M100 119 Q100 126 92 128 M100 119 Q100 126 108 128" stroke="#3A2E2A" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>`;
+}
+function paintBhalus(){["bhalu-svg","bhalu-svg2","bhalu-svg3"].forEach(id=>{const el=$(id); if(el) el.innerHTML=bhaluInner();});}
+function setMood(mood){
+  const el=$("bhalu-svg2"); if(!el) return;
+  el.setAttribute("class",""); void el.getBoundingClientRect();
+  if(mood) el.setAttribute("class","m-"+mood);
+}
+
+/* ================= scenarios ================= */
+const SCENARIOS=[
+ {id:"restaurant",e:"🍽️",name:"Restaurant",d:"Order food from a waiter",
+  persona:"You are a friendly, chatty waiter at a Pakistani restaurant in Karachi. Greet the customer warmly, describe dishes, take their order, and make small talk while they decide.",
+  openers:["Khush aamdeed! Mez par tashreef rakhiye. Aaj kya khaane ka mood hai?","Assalam-o-Alaikum! Humaare paas aaj nihari, biryani aur karahi gosht hai. Kya lenge?"]},
+ {id:"cab",e:"🚕",name:"Book a Cab",d:"Order a cab over the phone",
+  persona:"You are a cab driver answering the phone. Confirm where to pick the caller up, where they want to go, and chat a little about the route and traffic.",
+  openers:["Hello! Kahaan se pick karna hai aap ko?","Ji farmaiye, kahaan jaana hai? Location bataayein."]},
+ {id:"directions",e:"🗺️",name:"Ask Directions",d:"Ask a stranger how to get somewhere",
+  persona:"You are a friendly passerby on a street in Lahore. The learner will ask you for directions — answer helpfully, and chat a little like a real stranger would.",
+  openers:["Ji bhai, kuch chahiye?","Kahiye, main aap ki kya madad kar sakta hoon?"]},
+ {id:"stranger",e:"👋",name:"Small Talk",d:"Chat with a stranger at a dawat",
+  persona:"You are a warm, curious stranger making small talk at a dawat (a Pakistani family gathering). Be friendly, ask about them, share a little about yourself.",
+  openers:["Assalam-o-Alaikum! Aap kis taraf se aaye hain? Main to dulhe ka cousin hoon.","Aadaab! Khaana kaisa laga? Aap yahaan kis ko jaante hain?"]},
+ {id:"travel",e:"✈️",name:"Travel Stories",d:"Swap travel stories with a friend",
+  persona:"You are a friend who loves traveling. Swap travel stories, talk about dream destinations, and ask about their trips.",
+  openers:["Yaar, tum ne sab se khoobsurat jagah kaun si dekhi hai?","Agar kal tumhein kaheen bhi jaane ka ticket mile to kahaan jao ge?"]},
+ {id:"work",e:"💼",name:"Work Chat",d:"Talk about jobs over chai",
+  persona:"You are a colleague chatting about work and careers over chai. Ask about their job, share workplace stories, keep it relaxed.",
+  openers:["Aur sunaao, kaam kaisa chal raha hai aaj kal?","Tumhein apne kaam mein sab se achhi baat kya lagti hai?"]},
+ {id:"politics",e:"🗳️",name:"Debate",d:"Friendly debate on current affairs",
+  persona:"You are a friend who enjoys debating current affairs. Keep it light, playful and respectful — disagree sometimes to keep it interesting, but never hostile and never extreme.",
+  openers:["Bataao, mulk ke haalaat behtar ho rahe hain ya nahin?","Election mein vote daalna chahiye ya nahin? Tumhaari kya raaye hai?"]},
+ {id:"relatives",e:"🏠",name:"Relatives",d:"Catch up with a chatty relative",
+  persona:"You are a warm, chatty relative (like a favorite uncle or aunt) catching up at a family gathering. Ask about life, family, food — be affectionate and a little nosy, like real relatives are.",
+  openers:["Are! Bare dinon baad dekha. Sab khairiyat hai?","Beta, aaj kal kya masroofiyat hain? Sunaao kuch."]}
+];
+const DIFF={
+  easy:{label:"Easy",tts:0.9,window:12,style:"Use simple everyday words and short sentences. Talk about one simple thing at a time. Ask easy, direct questions. Be patient and encouraging in tone."},
+  medium:{label:"Medium",tts:1.0,window:8,style:"Speak at a natural conversational pace with normal everyday vocabulary. Ask follow-up questions about what they say. Occasionally introduce a related topic."},
+  hard:{label:"Hard",tts:1.06,window:5,style:"Speak fast, natural Urdu with idioms and expressions. Challenge their opinions and disagree playfully. Change topics suddenly, the way real unpredictable conversations do."}
+};
+const HARD_COMPLICATIONS=" In roleplay scenarios, add realistic complications (for example the waiter gets the order wrong, the driver misses a turn, the stranger misunderstands) and make the learner deal with them.";
+const NUDGES=["Sun rahe ho?","Kuch kaho na!","Soch mein parh gaye?","Hello? Tum wahaan ho?"];
+const GENTLE=["Koi baat nahin, aaraam se bolo.","Soch lo, main sun raha hoon."];
+const FILLERS=["matlab","yaani","achha","acha","toh","woh","wo","arey","aray","umm","uh","hmm","mmm","bas","phir"];
+const BASE_SYSTEM=`You are the conversation partner in "Bhalu", an Urdu speaking-fluency trainer. The learner understands Urdu fluently but is practicing SPONTANEOUS SPOKEN Urdu — retrieving words and building sentences quickly, without translating from English in their head.
+
+STRICT RULES:
+- Write ONLY in Roman Urdu: Urdu written with English/Latin letters (for example: "Tum kya khaana pasand karte ho?"). The learner cannot read Urdu script at all.
+- NEVER use Urdu script (Arabic letters). NEVER write in English. Every word you output must be Roman Urdu.
+- Keep every reply to 1–3 short sentences — a natural spoken turn, not a paragraph.
+- NEVER correct the learner's Urdu. NEVER comment on their mistakes. NEVER switch into teacher mode. Just keep the conversation flowing like a real person would.
+- Always end your turn with a question or a prompt that keeps them talking.
+- Do not say you are an AI. Stay in character.`;
+
+function systemPrompt(scn,diffId){
+  const d=DIFF[diffId];
+  return `${BASE_SYSTEM}\n\nYOUR CHARACTER: ${scn.persona}\n\nDIFFICULTY (${d.label}): ${d.style}${diffId==="hard"?HARD_COMPLICATIONS:""}`;
+}
+
+/* ================= screens ================= */
+function showScreen(id){
+  $$(".screen").forEach(s=>s.classList.remove("on"));
+  $(id).classList.add("on");
+  window.scrollTo(0,0);
+}
+</script>
+<script>
+"use strict";
+/* ================= voice: TTS ================= */
+/* Roman Urdu is spoken through the device's default voice, which pronounces
+   Latin-letter Urdu most intelligibly. */
+let speakToken=0, currentSpeakResolve=null, barged=false;
+function stopSpeaking(){
+  speakToken++;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  if(currentSpeakResolve){ const r=currentSpeakResolve; currentSpeakResolve=null; r({cancelled:true}); }
+}
+function speakUrdu(text,rate){
+  return new Promise(resolve=>{
+    if(!("speechSynthesis" in window)){ resolve({ok:false}); return; }
+    const my=++speakToken;
+    const done=v=>{ if(my!==speakToken) return; if(currentSpeakResolve){currentSpeakResolve=null;} resolve(v); };
+    currentSpeakResolve=v=>done(v);
+    try{
+      speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(text);
+      u.rate=rate||1;
+      u.onend=()=>done({ok:true}); u.onerror=()=>done({ok:false});
+      speechSynthesis.speak(u);
+      setTimeout(()=>done({ok:true}), Math.min(30000, Math.max(9000, text.length*220)));
+    }catch(e){ done({ok:false}); }
+  });
+}
+
+/* ================= voice: STT ================= */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let recog=null;
+function stopListening(){ try{ if(recog) recog.abort(); }catch(e){} }
+function listenTurn(onFirstSpeech){
+  return new Promise(resolve=>{
+    if(!SR){ resolve({error:"unsupported"}); return; }
+    let done=false, firstFired=false, interim="";
+    const finish=r=>{ if(done) return; done=true; resolve(r); };
+    try{
+      recog=new SR();
+      recog.lang="ur-PK"; recog.interimResults=true; recog.continuous=false; recog.maxAlternatives=1;
+      recog.onresult=ev=>{
+        let inter="",fin="";
+        for(const r of ev.results){ const t=r[0].transcript; if(r.isFinal) fin+=t+" "; else inter+=t; }
+        interim=(fin+" "+inter).trim();
+        if(!firstFired&&interim){ firstFired=true; try{onFirstSpeech&&onFirstSpeech();}catch(e){} }
+        if(fin.trim()){ try{recog.stop();}catch(e){} finish({text:interim}); }
+      };
+      recog.onerror=ev=>{
+        const code=ev.error||"error";
+        if(code==="aborted"||code==="no-speech") finish(interim?{text:interim}:{empty:true});
+        else finish({error:code,interim});
+      };
+      recog.onend=()=>finish(interim?{text:interim}:{empty:true});
+      recog.start();
+      setTimeout(()=>{ if(!done) finish(interim?{text:interim}:{empty:true}); },45000);
+    }catch(e){ finish({error:"start-failed"}); }
+  });
+}
+
+/* ================= Gemini ================= */
+const MODELS=["gemini-2.5-flash","gemini-flash-latest"];
+async function geminiFetch(model,body){
+  const key=store.key;
+  const res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent?key="+encodeURIComponent(key),
+    {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  if(!res.ok){ let t=""; try{t=await res.text();}catch(e){} throw {status:res.status,body:t}; }
+  return res.json();
+}
+async function geminiGenerate(systemText,contents){
+  let lastErr=null;
+  for(const m of MODELS){
+    try{
+      const data=await geminiFetch(m,{systemInstruction:{parts:[{text:systemText}]},contents});
+      const txt=(data&&data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts||[]).map(p=>p.text||"").join("").trim();
+      if(txt) return txt;
+      lastErr={status:"empty"};
+    }catch(e){ lastErr=e; if(e&&e.status===404) continue; throw e; }
+  }
+  throw lastErr||{status:"unknown"};
+}
+function geminiErrorMsg(e){
+  if(!e) return "Something went wrong talking to Bhalu's brain.";
+  if(e.status===400) return "That API key doesn't look valid. Check it in Settings (🔑).";
+  if(e.status===403) return "API key issue — make sure the Gemini API is enabled for your key.";
+  if(e.status===429) return "Bhalu's brain is rate-limited right now. Wait a minute and try again.";
+  if(e.status==="empty") return "Bhalu's brain went quiet. Try again!";
+  return "Network hiccup — check your connection and try again.";
+}
+const ANALYZE_SYSTEM=`You analyze an Urdu conversation transcript for a speaking-fluency report. The learner UNDERSTANDS Urdu fluently; they are training SPONTANEOUS SPOKEN production — fast word retrieval and sentence building without translating from English first.
+
+Return ONLY valid JSON, no markdown, no extra text:
+{
+ "fluencyScore": <1-100 overall spontaneous speaking fluency>,
+ "tenseMistakes": [{"wrong":"<their phrase in ROMAN URDU>","right":"<corrected in ROMAN URDU>","explain":"<one short line>"}] (max 5, prioritize tense errors like run/ran),
+ "englishExamples": ["<max 5 English words or phrases they fell back on>"],
+ "summary": "<2 encouraging sentences about this session>",
+ "tip": "<1 specific actionable tip for next session>"
+IMPORTANT: the learner cannot read Urdu script. Write wrong/right ONLY in Roman Urdu (Latin letters).}`;
+function extractJSON(s){
+  if(!s) return null;
+  const m=String(s).match(/\{[\s\S]*\}/);
+  if(!m) return null;
+  try{ return JSON.parse(m[0]); }catch(e){ return null; }
+}
+</script>
+<script>
+"use strict";
+/* ================= app state ================= */
+const state={scenarioId:null,diff:"easy",minutes:10,pressure:false};
+let session=null, micMode="idle", pressureExpired=false;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
+const FILL_UR=["مطلب","یعنی","اچھا","تو","وہ","ارے","بس","ہاں"];
+function savePrefs(){ store.prefs={scenarioId:state.scenarioId,diff:state.diff,minutes:state.minutes,pressure:state.pressure}; }
+
+/* ================= session UI bits ================= */
+function setMic(mode){
+  micMode=mode;
+  const b=$("mic-btn");
+  b.classList.remove("listening","busy");
+  const hints={idle:"tap to jump in while Bhalu speaks",speaking:"tap to jump in 🖐️",listening:"speak now — tap when done 🎤",busy:"Bhalu is thinking… 💭"};
+  if(mode==="listening") b.classList.add("listening");
+  if(mode==="busy") b.classList.add("busy");
+  $("mic-hint").textContent=hints[mode]||hints.idle;
+}
+function setStatus(t){ $("status-line").textContent=t; }
+function addBubble(role,text,rt){
+  const log=$("chat-log");
+  const d=document.createElement("div");
+  d.className="bubble "+role;
+  if(role==="partner"){
+    d.innerHTML='<span class="who">🐻 BHALU</span>'+esc(text);
+  }else{
+    // the learner can't read Urdu script, so their turn shows as a
+    // response-time pill instead of an unreadable transcript
+    d.innerHTML="🎤 "+(rt!=null?rt.toFixed(1)+"s":"replied");
+    d.style.fontSize="15px";
+  }
+  log.appendChild(d); log.scrollTop=log.scrollHeight;
+}
+
+/* pressure ring */
+let pTimer=null; const PCIRC=389.5;
+function startPressure(sec){
+  const ring=$("pressure-ring"),fg=$("pressure-fg");
+  ring.classList.add("on"); let left=sec;
+  fg.style.strokeDashoffset=0;
+  pTimer=setInterval(()=>{
+    left-=0.1;
+    fg.style.strokeDashoffset=PCIRC*(1-Math.max(0,left)/sec);
+    if(left<=0){ clearInterval(pTimer); pTimer=null; pressureExpired=true; stopListening(); }
+  },100);
+}
+function stopPressure(){ if(pTimer){clearInterval(pTimer);pTimer=null;} const r=$("pressure-ring"); if(r) r.classList.remove("on"); }
+
+/* session clock */
+let sTimer=null;
+function startSessTimer(){
+  let left=session.durationMin*60;
+  const el=$("sess-timer");
+  const tick=()=>{
+    if(!session||!session.active){ clearInterval(sTimer); return; }
+    const m=Math.floor(Math.max(0,left)/60),s=Math.max(0,left)%60;
+    el.textContent=m+":"+String(s).padStart(2,"0");
+    if(left<=0){ endSession(); return; }
+    left--;
+  };
+  tick(); sTimer=setInterval(tick,1000);
+}
+
+/* ================= metrics ================= */
+function recordMetrics(text){
+  if(session.firstSpeechAt&&session.partnerFinishedAt){
+    const rt=(session.firstSpeechAt-session.partnerFinishedAt)/1000;
+    session.responseTimes.push(Math.max(0,Math.min(120,rt)));
+  }
+  const en=text.match(/[a-zA-Z]+(?:'[a-z]+)?/g)||[];
+  en.forEach(w=>{ const lw=w.toLowerCase();
+    session.englishWords.push(lw);
+    if(!session.englishExamples.includes(lw)&&session.englishExamples.length<40) session.englishExamples.push(lw);
+  });
+  const low=" "+text.toLowerCase()+" ";
+  FILLERS.forEach(f=>{ let i=0,idx=low.indexOf(" "+f+" "); while(idx>=0){i++;idx=low.indexOf(" "+f+" ",idx+1);} session.fillers+=i; });
+  FILL_UR.forEach(f=>{ let i=0,idx=text.indexOf(f); while(idx>=0){i++;idx=text.indexOf(f,idx+1);} session.fillers+=i; });
+}
+
+/* ================= conversation loop ================= */
+async function userTurn(){
+  const cfg=DIFF[session.diff];
+  while(session.active){
+    session.partnerFinishedAt=Date.now(); session.firstSpeechAt=null; pressureExpired=false;
+    setMood("listen"); setMic("listening"); setStatus("Your turn — speak! 🎤");
+    if(session.pressure) startPressure(cfg.window);
+    const res=await listenTurn(()=>{
+      if(!session.firstSpeechAt){ session.firstSpeechAt=Date.now(); stopPressure(); setMood("idle"); }
+    });
+    stopPressure();
+    if(!session.active) return null;
+    const late=pressureExpired;
+    if(res.text&&res.text.trim()){
+      if(late) session.freezes++;
+      session.consecEmpty=0;
+      return res.text.trim();
+    }
+    if(res.error){
+      setStatus("Mic trouble — trying again… 🎤"); setMood("nervous");
+      await sleep(2200); continue;
+    }
+    session.consecEmpty=(session.consecEmpty||0)+1;
+    if(session.pressure){
+      session.freezes++; setMood("nervous"); setMic("speaking"); setStatus("Too slow — Bhalu jumps in! ⏰");
+      await speakUrdu(pick(NUDGES),cfg.tts);
+      if(!session.active) return null;
+      if(session.consecEmpty>=2){ session._askSimple=true; session.consecEmpty=0; }
+    }else if(session.consecEmpty>=3){
+      session.consecEmpty=0; setMic("speaking"); setMood("idle");
+      await speakUrdu(pick(GENTLE),cfg.tts);
+      if(!session.active) return null;
+    }
+  }
+  return null;
+}
+
+async function sessionLoop(firstPartnerText){
+  const cfg=DIFF[session.diff];
+  let partnerText=firstPartnerText;
+  setMood("cheer");
+  while(session.active){
+    addBubble("partner",partnerText);
+    setMic("speaking"); setMood("idle"); setStatus("Bhalu is speaking… 🐻");
+    barged=false;
+    await speakUrdu(partnerText,cfg.tts);
+    if(!session.active) break;
+    const userText=await userTurn();
+    if(!session.active||userText===null) break;
+    const rt=(session.firstSpeechAt&&session.partnerFinishedAt)
+      ? Math.max(0,Math.min(120,(session.firstSpeechAt-session.partnerFinishedAt)/1000)) : null;
+    addBubble("user",null,rt);
+    recordMetrics(userText);
+    session.contents.push({role:"user",parts:[{text:userText}]});
+    setMic("busy"); setMood("thinking"); setStatus("Bhalu is thinking… 💭");
+    $("typing").classList.add("on");
+    let sys=systemPrompt(session.scn,session.diff);
+    if(session._askSimple){ sys+="\n\nIMPORTANT: The learner just froze twice in a row. Ask a VERY simple, easy question to get them talking again."; session._askSimple=false; }
+    try{
+      partnerText=await geminiGenerate(sys,session.contents);
+    }catch(e){
+      $("typing").classList.remove("on");
+      setStatus(geminiErrorMsg(e)); setMood("nervous");
+      await sleep(2600);
+      if(!session.active) break;
+      partnerText="Maaf kijiye, main samajh nahin saka. Phir se kahiye?";
+    }
+    $("typing").classList.remove("on");
+    session.contents.push({role:"model",parts:[{text:partnerText}]});
+  }
+}
+
+async function startSession(){
+  const scn=SCENARIOS.find(s=>s.id===state.scenarioId)||pick(SCENARIOS);
+  state.scenarioId=scn.id; savePrefs();
+  session={active:true,scn,diff:state.diff,durationMin:state.minutes,pressure:state.pressure,
+    contents:[],responseTimes:[],englishWords:[],englishExamples:[],freezes:0,fillers:0,
+    partnerFinishedAt:0,firstSpeechAt:null,consecEmpty:0,_askSimple:false,startAt:Date.now()};
+  showScreen("scr-session");
+  $("sess-scenario").textContent=scn.e+" "+scn.name;
+  $("chat-log").innerHTML=""; $("typing").classList.remove("on");
+  setMood("cheer"); setMic("idle"); setStatus("Get ready… 🎬");
+  startSessTimer();
+  await sleep(900);
+  if(!session.active) return;
+  const opener=pick(scn.openers);
+  session.contents.push({role:"model",parts:[{text:opener}]});
+  await sessionLoop(opener);
+}
+
+/* ================= report ================= */
+function animateScore(score){
+  const C=402,fg=$("score-fg");
+  requestAnimationFrame(()=>{ fg.style.strokeDashoffset=score==null?C:C*(1-Math.max(0,Math.min(100,score))/100); });
+}
+function renderReport(a,rt){
+  const score=(a&&a.fluencyScore)||Math.max(20,Math.min(95,Math.round(100-rt*4-session.freezes*6)));
+  animateScore(score); $("score-num").textContent=score;
+  $("report-summary").textContent=(a&&a.summary)||"Nice session! Bhalu can hear you getting faster. A little every day goes a long way. 💪";
+  $("report-tip").textContent=(a&&a.tip)||"Narrate what you're doing around the house in Urdu — it's free practice.";
+  const ex=(a&&a.englishExamples&&a.englishExamples.length)?a.englishExamples:session.englishExamples.slice(0,5);
+  $("en-examples").innerHTML=ex.length?`<div class="corr"><b>🗣️ English fallback:</b> ${ex.map(esc).join(", ")}</div>`:`<div class="corr" style="background:#F0FBF9"><b>🌟 Zero English!</b> You stayed in Urdu the whole time.</div>`;
+  const cl=$("corrections-list");
+  cl.innerHTML=(a&&a.tenseMistakes&&a.tenseMistakes.length)
+    ? "<b>📝 Tense fixes:</b>"+a.tenseMistakes.map(c=>`<div class="corr"><span class="w">${esc(c.wrong)}</span> → <span class="r">${esc(c.right)}</span><div class="e">${esc(c.explain)}</div></div>`).join("")
+    : "";
+  // level-up nudge
+  const order=["easy","medium","hard"],i=order.indexOf(session.diff),box=$("levelup-box");
+  const same=store.history.filter(h=>h.diff===session.diff);
+  if(i<2&&same.length>=2&&same[0].score>=80&&same[1].score>=80){
+    $("levelup-text").textContent=`Bhalu thinks you're ready for ${DIFF[order[i+1]].label}! 🚀`;
+    box.classList.add("on");
+    $("btn-levelup").onclick=()=>{ state.diff=order[i+1]; savePrefs(); syncHomeUI(); box.classList.remove("on"); showScreen("scr-home"); };
+  }else box.classList.remove("on");
+  return score;
+}
+function saveHistory(score,rt){
+  const h=store.history;
+  h.unshift({d:Date.now(),scn:session.scn.id,diff:session.diff,min:session.durationMin,
+    rt:session.responseTimes.length?+rt.toFixed(1):null,en:session.englishWords.length,
+    fr:session.freezes,fi:session.fillers,score});
+  store.history=h.slice(0,100);
+}
+async function endSession(){
+  if(!session||!session.active) return;
+  session.active=false;
+  clearInterval(sTimer); stopPressure(); stopSpeaking(); stopListening();
+  setMic("idle");
+  showScreen("scr-report");
+  $("report-scenario-line").textContent=`${session.scn.e} ${session.scn.name} • ${DIFF[session.diff].label} • ${session.durationMin} min`;
+  const rt=avg(session.responseTimes);
+  $("stat-rt").textContent=session.responseTimes.length?rt.toFixed(1)+"s":"–";
+  $("stat-en").textContent=session.englishWords.length;
+  $("stat-freeze").textContent=session.freezes;
+  $("stat-filler").textContent=session.fillers;
+  animateScore(null); $("score-num").textContent="…";
+  $("report-summary").textContent="Bhalu is reading your conversation… 🔍";
+  $("en-examples").innerHTML=""; $("corrections-list").innerHTML=""; $("report-tip").textContent="…";
+  const transcript=session.contents.map(t=>(t.role==="model"?"Partner":"You")+": "+t.parts[0].text).join("\n");
+  let analysis=null;
+  try{
+    const raw=await geminiGenerate(ANALYZE_SYSTEM,[{role:"user",parts:[{text:"TRANSCRIPT:\n"+(transcript||"(the learner said nothing this session)")}] }]);
+    analysis=extractJSON(raw);
+  }catch(e){ analysis=null; }
+  const score=renderReport(analysis,rt);
+  saveHistory(score,rt);
+  renderTrends(); updateCount();
+  confetti();
+}
+function confetti(){
+  const box=$("confetti"); box.innerHTML="";
+  const colors=["#FF6B6B","#2EC4B6","#FFD93D","#7C5CBF","#FF9EBB"];
+  for(let i=0;i<70;i++){
+    const d=document.createElement("div"); d.className="cf";
+    d.style.left=Math.random()*100+"vw";
+    d.style.background=pick(colors);
+    d.style.animationDuration=(2.2+Math.random()*2)+"s";
+    d.style.animationDelay=(Math.random()*0.9)+"s";
+    box.appendChild(d);
+    setTimeout(()=>d.remove(),5200);
+  }
+}
+
+/* ================= trends ================= */
+function spark(values,color){
+  if(!values||values.length<2) return "";
+  const w=300,h=64,p=8;
+  const min=Math.min(...values),max=Math.max(...values),rng=(max-min)||1;
+  const pts=values.map((v,i)=>`${(p+i*(w-2*p)/(values.length-1)).toFixed(1)},${(h-p-(v-min)/rng*(h-2*p)).toFixed(1)}`).join(" ");
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function renderTrends(){
+  const box=$("trends-box"); if(!box) return;
+  const h=store.history.slice(0,10).reverse();
+  if(!h.length){ box.innerHTML=`<div class="empty-note">No sessions yet — Bhalu is waiting! 🐻</div>`; return; }
+  const rts=h.map(x=>x.rt==null?null:x.rt).filter(v=>v!=null);
+  const ens=h.map(x=>x.en);
+  box.innerHTML=`
+    <div class="trend"><div class="t">⚡ Avg response time ${rts.length?`(${rts[rts.length-1].toFixed(1)}s latest)`:""}</div>${spark(rts,"#2EC4B6")||'<div class="empty-note">—</div>'}</div>
+    <div class="trend"><div class="t">🗣️ English words per session ${ens.length?`(${ens[ens.length-1]} latest)`:""}</div>${spark(ens,"#FF6B6B")}</div>`;
+}
+function updateCount(){
+  const n=store.history.length;
+  $("history-count").textContent=n+(n===1?" session":" sessions");
+}
+
+/* ================= home wiring ================= */
+function buildScenarioGrid(){
+  const g=$("scenario-grid"); g.innerHTML="";
+  SCENARIOS.forEach(s=>{
+    const b=document.createElement("button");
+    b.className="scn"+(state.scenarioId===s.id?" sel":"");
+    b.innerHTML=`<span class="e">${s.e}</span><span class="t">${s.name}</span><span class="d">${s.d}</span>`;
+    b.onclick=()=>{ state.scenarioId=s.id; savePrefs(); syncHomeUI(); };
+    g.appendChild(b);
+  });
+}
+function syncHomeUI(){
+  $$("#scenario-grid .scn").forEach((el,i)=>el.classList.toggle("sel",SCENARIOS[i]&&SCENARIOS[i].id===state.scenarioId));
+  $$("#diff-seg button").forEach(b=>b.classList.toggle("sel",b.dataset.d===state.diff));
+  $("slider-min").value=state.minutes; $("slider-val").textContent=state.minutes;
+  $("toggle-pressure").classList.toggle("on",state.pressure);
+}
+
+/* ================= init ================= */
+function init(){
+  paintBhalus();
+  const p=store.prefs;
+  if(p.scenarioId) state.scenarioId=p.scenarioId;
+  if(p.diff&&DIFF[p.diff]) state.diff=p.diff;
+  if(p.minutes) state.minutes=Math.min(20,Math.max(3,p.minutes));
+  state.pressure=!!p.pressure;
+  buildScenarioGrid(); syncHomeUI(); renderTrends(); updateCount();
+
+  $("btn-start-welcome").onclick=()=>showScreen(store.key?"scr-home":"scr-setup");
+
+  $("btn-get-key").onclick=()=>window.open("https://aistudio.google.com/apikey","_blank");
+  $("btn-back-setup").onclick=()=>showScreen(store.key?"scr-home":"scr-welcome");
+  $("btn-save-key").onclick=async()=>{
+    const k=$("inp-key").value.trim(),msg=$("setup-msg");
+    if(!k){ msg.className="msg err"; msg.textContent="Paste your key first!"; return; }
+    msg.className="msg"; msg.textContent="Testing key… 🔄";
+    const old=store.key; store.key=k;
+    try{
+      await geminiGenerate("Reply with exactly: OK",[{role:"user",parts:[{text:"hi"}]}]);
+      msg.className="msg ok"; msg.textContent="Key works! Welcome aboard 🎉";
+      setTimeout(()=>showScreen("scr-home"),700);
+    }catch(e){
+      store.key=old;
+      msg.className="msg err"; msg.textContent=geminiErrorMsg(e);
+    }
+  };
+
+  $("btn-settings").onclick=()=>{ $("inp-key").value=store.key; $("setup-msg").textContent=""; showScreen("scr-setup"); };
+  $("btn-surprise").onclick=()=>{ state.scenarioId=pick(SCENARIOS).id; savePrefs(); syncHomeUI(); };
+  $$("#diff-seg button").forEach(b=>b.onclick=()=>{ state.diff=b.dataset.d; savePrefs(); syncHomeUI(); });
+  $("slider-min").oninput=e=>{ state.minutes=+e.target.value; $("slider-val").textContent=state.minutes; savePrefs(); };
+  $("toggle-pressure").onclick=e=>{ state.pressure=!state.pressure; e.currentTarget.classList.toggle("on",state.pressure); savePrefs(); };
+  $("btn-start-session").onclick=()=>{
+    if(!SR){ const w=$("home-warn"); w.textContent="⚠️ Voice recognition isn't available in this browser. Please open this page in Safari on your iPhone."; w.classList.add("on"); return; }
+    if(!store.key){ showScreen("scr-setup"); return; }
+    if(!state.scenarioId) state.scenarioId=pick(SCENARIOS).id;
+    startSession();
+  };
+  $("btn-end-session").onclick=()=>{ if(confirm("End this session early?")) endSession(); };
+  $("btn-voice-test").onclick=()=>{ speakUrdu("Assalam-o-Alaikum! Main Bhalu hoon. Kya tum taiyaar ho?",1); };
+  $("mic-btn").onclick=()=>{
+    if(!session||!session.active) return;
+    if(micMode==="speaking"){ barged=true; stopSpeaking(); }
+    else if(micMode==="listening"){ stopListening(); }
+  };
+  $("btn-again").onclick=()=>startSession();
+  $("btn-home2").onclick=()=>showScreen("scr-home");
+
+  $("btn-export").onclick=()=>{
+    const blob=new Blob([JSON.stringify(store.history)],{type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download="bhalu-backup.json"; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  };
+  $("btn-import").onclick=()=>$("file-import").click();
+  $("file-import").onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{ try{
+      const arr=JSON.parse(r.result);
+      if(!Array.isArray(arr)) throw 0;
+      const cur=store.history,seen=new Set(cur.map(x=>x.d));
+      arr.forEach(x=>{ if(x&&x.d&&!seen.has(x.d)){cur.push(x);seen.add(x.d);} });
+      cur.sort((a,b)=>b.d-a.d); store.history=cur.slice(0,100);
+      renderTrends(); updateCount(); alert("Backup restored! 🎉");
+    }catch(err){ alert("That file didn't look like a Bhalu backup."); } };
+    r.readAsText(f); e.target.value="";
+  };
+
+  if(!SR){ const w=$("home-warn"); w.textContent="⚠️ This browser can't do voice recognition — open this page in Safari on your iPhone for the full experience."; w.classList.add("on"); }
+  if(!("speechSynthesis" in window)){ const w=$("home-warn"); w.textContent="⚠️ This browser can't speak aloud — Bhalu's voice needs Safari or Chrome."; w.classList.add("on"); }
+
+  showScreen(store.key?"scr-home":"scr-welcome");
+}
+document.addEventListener("DOMContentLoaded",init);
+</script>
+</html>
