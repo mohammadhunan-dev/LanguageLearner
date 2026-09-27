@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#FFF7EC">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="app-version" content="0.0.3">
+<meta name="app-version" content="0.0.4">
 <title>Bhalu — Urdu Speaking Trainer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -573,18 +573,22 @@ function speakUrdu(roman,script,rate){
     const my=++speakToken;
     const done=v=>{ if(my!==speakToken) return; if(currentSpeakResolve){currentSpeakResolve=null;} resolve(v); };
     currentSpeakResolve=v=>done(v);
+    setStatus("Bhalu is finding his voice… 💭");
     (async()=>{
-      try{
-        setStatus("Bhalu is finding his voice… 💭");
-        const b64=await ttsFetch(script||roman);
-        if(my!==speakToken) return; // cancelled while fetching
+      let b64=null, ttsErr="";
+      for(let attempt=0; attempt<2 && !b64; attempt++){
+        if(my!==speakToken) return; // cancelled
+        try{ b64=await ttsFetch(script||roman); }
+        catch(e){ ttsErr=(e&&e.message)||"error"; await sleep(900); }
+      }
+      if(b64&&my===speakToken){
         setStatus("Bhalu is speaking… 🐻");
         done(await playWav(b64));
-      }catch(e){
-        if(my!==speakToken) return;
-        setStatus("Bhalu is speaking… 🐻");
-        done(await speakDevice(roman,rate));
+        return;
       }
+      if(my!==speakToken) return;
+      setStatus(ttsErr?("Voice hiccup ("+ttsErr+") — device voice 🎙️"):"Bhalu is speaking… 🐻");
+      done(await speakDevice(roman,rate));
     })();
   });
 }
@@ -649,7 +653,8 @@ async function micTest(){
     line("✅ Microphone access granted.","good");
   }catch(e){
     line("❌ Microphone blocked ("+(e&&e.name||"error")+").","bad");
-    line("Fix: iPhone Settings → Apps → Safari → Microphone → Allow. Then reload this page and test again.","bad");
+    line("Safari was told “Don't Allow” for this site before, so it won't ask again.","bad");
+    line("Fix: in Safari tap the page menu (left of the address bar) → Website Settings → Microphone → Allow. Then reload this page and test again.","bad");
     return;
   }
   line("🗣️ Say something in Urdu — listening for 10 seconds…");
@@ -677,7 +682,7 @@ async function micTest(){
 
 function micErrorMsg(code){
   if(code==="not-allowed"||code==="service-not-allowed")
-    return "🚫 Mic blocked. iPhone Settings → Apps → Safari → Microphone → Allow, then reload this page.";
+    return "🚫 Mic blocked for this site (Safari won't ask again after “Don't Allow”). Safari page menu → Website Settings → Microphone → Allow, then reload.";
   if(code==="language-not-supported")
     return "This iPhone can't do Urdu voice typing. Tell Bhalu (on the home screen mic test) what you saw.";
   if(code==="network") return "Voice typing needs internet — check your connection.";
