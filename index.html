@@ -406,28 +406,44 @@ function setMood(mood){
 const SCENARIOS=[
  {id:"restaurant",e:"🍽️",name:"Restaurant",d:"Order food from a waiter",
   persona:"You are a friendly, chatty waiter at a Pakistani restaurant in Karachi. Greet the customer warmly, describe dishes, take their order, and make small talk while they decide.",
-  openers:["Khush aamdeed! Mez par tashreef rakhiye. Aaj kya khaane ka mood hai?","Assalam-o-Alaikum! Humaare paas aaj nihari, biryani aur karahi gosht hai. Kya lenge?"]},
+  openers:[
+   {roman:"Khush aamdeed! Mez par tashreef rakhiye. Aaj kya khaane ka mood hai?",script:"خوش آمدید! میز پر تشریف رکھیں۔ آج کیا کھانے کا موڈ ہے؟"},
+   {roman:"Assalam-o-Alaikum! Humaare paas aaj nihari, biryani aur karahi gosht hai. Kya lenge?",script:"السلام علیکم! ہمارے پاس آج نہاری، بریانی اور کڑاہی گوشت ہے۔ کیا لیں گے؟"}]},
  {id:"cab",e:"🚕",name:"Book a Cab",d:"Order a cab over the phone",
   persona:"You are a cab driver answering the phone. Confirm where to pick the caller up, where they want to go, and chat a little about the route and traffic.",
-  openers:["Hello! Kahaan se pick karna hai aap ko?","Ji farmaiye, kahaan jaana hai? Location bataayein."]},
+  openers:[
+   {roman:"Hello! Kahaan se pick karna hai aap ko?",script:"ہیلو! کہاں سے پک کرنا ہے آپ کو؟"},
+   {roman:"Ji farmaiye, kahaan jaana hai? Location bataayein.",script:"جی فرمائیے، کہاں جانا ہے؟ لوکیشن بتائیں۔"}]},
  {id:"directions",e:"🗺️",name:"Ask Directions",d:"Ask a stranger how to get somewhere",
   persona:"You are a friendly passerby on a street in Lahore. The learner will ask you for directions — answer helpfully, and chat a little like a real stranger would.",
-  openers:["Ji bhai, kuch chahiye?","Kahiye, main aap ki kya madad kar sakta hoon?"]},
+  openers:[
+   {roman:"Ji bhai, kuch chahiye?",script:"جی بھائی، کچھ چاہیے؟"},
+   {roman:"Kahiye, main aap ki kya madad kar sakta hoon?",script:"کہیے، میں آپ کی کیا مدد کر سکتا ہوں؟"}]},
  {id:"stranger",e:"👋",name:"Small Talk",d:"Chat with a stranger at a dawat",
   persona:"You are a warm, curious stranger making small talk at a dawat (a Pakistani family gathering). Be friendly, ask about them, share a little about yourself.",
-  openers:["Assalam-o-Alaikum! Aap kis taraf se aaye hain? Main to dulhe ka cousin hoon.","Aadaab! Khaana kaisa laga? Aap yahaan kis ko jaante hain?"]},
+  openers:[
+   {roman:"Assalam-o-Alaikum! Aap kis taraf se aaye hain? Main to dulhe ka cousin hoon.",script:"السلام علیکم! آپ کس طرف سے آئے ہیں؟ میں تو دولہے کا کزن ہوں۔"},
+   {roman:"Aadaab! Khaana kaisa laga? Aap yahaan kis ko jaante hain?",script:"آداب! کھانا کیسا لگا؟ آپ یہاں کس کو جانتے ہیں؟"}]},
  {id:"travel",e:"✈️",name:"Travel Stories",d:"Swap travel stories with a friend",
   persona:"You are a friend who loves traveling. Swap travel stories, talk about dream destinations, and ask about their trips.",
-  openers:["Yaar, tum ne sab se khoobsurat jagah kaun si dekhi hai?","Agar kal tumhein kaheen bhi jaane ka ticket mile to kahaan jao ge?"]},
+  openers:[
+   {roman:"Yaar, tum ne sab se khoobsurat jagah kaun si dekhi hai?",script:"یار، تم نے سب سے خوبصورت جگہ کون سی دیکھی ہے؟"},
+   {roman:"Agar kal tumhein kaheen bhi jaane ka ticket mile to kahaan jao ge?",script:"اگر کل تمہیں کہیں بھی جانے کا ٹکٹ ملے تو کہاں جاؤ گے؟"}]},
  {id:"work",e:"💼",name:"Work Chat",d:"Talk about jobs over chai",
   persona:"You are a colleague chatting about work and careers over chai. Ask about their job, share workplace stories, keep it relaxed.",
-  openers:["Aur sunaao, kaam kaisa chal raha hai aaj kal?","Tumhein apne kaam mein sab se achhi baat kya lagti hai?"]},
+  openers:[
+   {roman:"Aur sunaao, kaam kaisa chal raha hai aaj kal?",script:"اور سناؤ، کام کیسا چل رہا ہے آج کل؟"},
+   {roman:"Tumhein apne kaam mein sab se achhi baat kya lagti hai?",script:"تمہیں اپنے کام میں سب سے اچھی بات کیا لگتی ہے؟"}]},
  {id:"politics",e:"🗳️",name:"Debate",d:"Friendly debate on current affairs",
   persona:"You are a friend who enjoys debating current affairs. Keep it light, playful and respectful — disagree sometimes to keep it interesting, but never hostile and never extreme.",
-  openers:["Bataao, mulk ke haalaat behtar ho rahe hain ya nahin?","Election mein vote daalna chahiye ya nahin? Tumhaari kya raaye hai?"]},
+  openers:[
+   {roman:"Bataao, mulk ke haalaat behtar ho rahe hain ya nahin?",script:"بتاؤ، ملک کے حالات بہتر ہو رہے ہیں یا نہیں؟"},
+   {roman:"Election mein vote daalna chahiye ya nahin? Tumhaari kya raaye hai?",script:"الیکشن میں ووٹ ڈالنا چاہیے یا نہیں؟ تمہاری کیا رائے ہے؟"}]},
  {id:"relatives",e:"🏠",name:"Relatives",d:"Catch up with a chatty relative",
   persona:"You are a warm, chatty relative (like a favorite uncle or aunt) catching up at a family gathering. Ask about life, family, food — be affectionate and a little nosy, like real relatives are.",
-  openers:["Are! Bare dinon baad dekha. Sab khairiyat hai?","Beta, aaj kal kya masroofiyat hain? Sunaao kuch."]}
+  openers:[
+   {roman:"Are! Bare dinon baad dekha. Sab khairiyat hai?",script:"ارے! بڑے دنوں بعد دیکھا۔ سب خیریت ہے؟"},
+   {roman:"Beta, aaj kal kya masroofiyat hain? Sunaao kuch.",script:"بیٹا، آج کل کیا مصروفیات ہیں؟ سناؤ کچھ۔"}]}
 ];
 const DIFF={
   easy:{label:"Easy",tts:0.9,window:12,style:"Use simple everyday words and short sentences. Talk about one simple thing at a time. Ask easy, direct questions. Be patient and encouraging in tone."},
@@ -435,15 +451,24 @@ const DIFF={
   hard:{label:"Hard",tts:1.06,window:5,style:"Speak fast, natural Urdu with idioms and expressions. Challenge their opinions and disagree playfully. Change topics suddenly, the way real unpredictable conversations do."}
 };
 const HARD_COMPLICATIONS=" In roleplay scenarios, add realistic complications (for example the waiter gets the order wrong, the driver misses a turn, the stranger misunderstands) and make the learner deal with them.";
-const NUDGES=["Sun rahe ho?","Kuch kaho na!","Soch mein parh gaye?","Hello? Tum wahaan ho?"];
-const GENTLE=["Koi baat nahin, aaraam se bolo.","Soch lo, main sun raha hoon."];
+const NUDGES=[
+ {roman:"Sun rahe ho?",script:"سن رہے ہو؟"},
+ {roman:"Kuch kaho na!",script:"کچھ کہو نا!"},
+ {roman:"Soch mein parh gaye?",script:"سوچ میں پڑ گئے؟"},
+ {roman:"Hello? Tum wahaan ho?",script:"ہیلو؟ تم وہاں ہو؟"}];
+const GENTLE=[
+ {roman:"Koi baat nahin, aaraam se bolo.",script:"کوئی بات نہیں، آرام سے بولو۔"},
+ {roman:"Soch lo, main sun raha hoon.",script:"سوچ لو، میں سن رہا ہوں۔"}];
+const FALLBACK={roman:"Maaf kijiye, main samajh nahin saka. Phir se kahiye?",script:"معاف کیجیے، میں سمجھ نہیں سکا۔ پھر سے کہیے؟"};
 const FILLERS=["matlab","yaani","achha","acha","toh","woh","wo","arey","aray","umm","uh","hmm","mmm","bas","phir"];
 const BASE_SYSTEM=`You are the conversation partner in "Bhalu", an Urdu speaking-fluency trainer. The learner understands Urdu fluently but is practicing SPONTANEOUS SPOKEN Urdu — retrieving words and building sentences quickly, without translating from English in their head.
 
 STRICT RULES:
-- Write ONLY in Roman Urdu: Urdu written with English/Latin letters (for example: "Tum kya khaana pasand karte ho?"). The learner cannot read Urdu script at all.
-- NEVER use Urdu script (Arabic letters). NEVER write in English. Every word you output must be Roman Urdu.
-- Keep every reply to 1–3 short sentences — a natural spoken turn, not a paragraph.
+- Respond with ONLY a JSON object, no other text: {"speak":"<your reply in Urdu script>","show":"<the same reply in Roman Urdu>"}
+- "speak" is what Bhalu says out loud: write it in proper Urdu script (Arabic letters).
+- "show" is what appears on screen: the SAME reply in Roman Urdu, i.e. Urdu written with English/Latin letters (for example: "Tum kya khaana pasand karte ho?"). The learner cannot read Urdu script at all, so "show" must never contain Urdu script.
+- NEVER write in English anywhere in the JSON. Every word must be Urdu.
+- Keep the reply to 1–3 short sentences — a natural spoken turn, not a paragraph.
 - NEVER correct the learner's Urdu. NEVER comment on their mistakes. NEVER switch into teacher mode. Just keep the conversation flowing like a real person would.
 - Always end your turn with a question or a prompt that keeps them talking.
 - Do not say you are an AI. Stay in character.`;
@@ -462,30 +487,108 @@ function showScreen(id){
 </script>
 <script>
 "use strict";
-/* ================= voice: TTS ================= */
-/* Roman Urdu is spoken through the device's default voice, which pronounces
-   Latin-letter Urdu most intelligibly. */
-let speakToken=0, currentSpeakResolve=null, barged=false;
-function stopSpeaking(){
-  speakToken++;
-  try{ speechSynthesis.cancel(); }catch(e){}
-  if(currentSpeakResolve){ const r=currentSpeakResolve; currentSpeakResolve=null; r({cancelled:true}); }
+/* ================= voice: Gemini TTS ================= */
+/* Bhalu speaks with a natural AI Urdu voice via the Gemini TTS API
+   (same free API key). Falls back to the device voice if the call fails. */
+const TTS_MODEL="gemini-3.8-flash-tts", TTS_VOICE="Sulafat"; // Sulafat = warm
+let speakToken=0, currentSpeakResolve=null, barged=false, ttsAudio=null;
+
+async function ttsFetch(scriptText){
+  const key=store.key;
+  const res=await fetch("https://generativelanguage.googleapis.com/v1beta/interactions?key="+encodeURIComponent(key),{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:TTS_MODEL,
+      input:[{type:"user_input",content:[{type:"text",text:scriptText,
+        annotations:[{type:"speech_metadata",
+          style:"warm and friendly, like a cheerful bear chatting with a friend"}]}]}],
+      response_format:{type:"audio"},
+      generation_config:{speech_config:[{voice:TTS_VOICE}]}
+    })
+  });
+  if(!res.ok) throw new Error("tts http "+res.status);
+  const data=await res.json();
+  let b64=null;
+  for(const s of (data.steps||[])){
+    if(s.type!=="model_output"||!s.content) continue;
+    for(const c of s.content){ if(c.type==="audio"&&c.data) b64=c.data; }
+  }
+  if(!b64) throw new Error("no audio in tts response");
+  return b64; // base64 WAV
 }
-function speakUrdu(text,rate){
+
+function playWav(b64){
+  return new Promise(resolve=>{
+    try{
+      const bin=atob(b64), bytes=new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+      const url=URL.createObjectURL(new Blob([bytes],{type:"audio/wav"}));
+      const a=new Audio(url);
+      ttsAudio=a;
+      a.onended=()=>{ URL.revokeObjectURL(url); if(ttsAudio===a) ttsAudio=null; resolve({ok:true}); };
+      a.onerror=()=>{ URL.revokeObjectURL(url); if(ttsAudio===a) ttsAudio=null; resolve({ok:false}); };
+      const p=a.play();
+      if(p&&p.catch) p.catch(()=>resolve({ok:false}));
+    }catch(e){ resolve({ok:false}); }
+  });
+}
+
+/* device-voice fallback */
+function speakDevice(roman,rate){
   return new Promise(resolve=>{
     if(!("speechSynthesis" in window)){ resolve({ok:false}); return; }
+    let finished=false;
+    const fin=v=>{ if(!finished){finished=true; resolve(v);} };
+    try{
+      speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(roman);
+      u.rate=rate||1;
+      u.onend=()=>fin({ok:true}); u.onerror=()=>fin({ok:false});
+      speechSynthesis.speak(u);
+      setTimeout(()=>fin({ok:true}), Math.min(30000,Math.max(9000,roman.length*220)));
+    }catch(e){ fin({ok:false}); }
+  });
+}
+
+function stopSpeaking(){
+  try{ if(ttsAudio){ ttsAudio.pause(); ttsAudio=null; } }catch(e){}
+  try{ speechSynthesis.cancel(); }catch(e){}
+  if(currentSpeakResolve){ const r=currentSpeakResolve; currentSpeakResolve=null; r({cancelled:true}); }
+  speakToken++;
+}
+
+/* roman = on-screen text, script = what Bhalu says out loud (Urdu script) */
+function speakUrdu(roman,script,rate){
+  return new Promise(resolve=>{
     const my=++speakToken;
     const done=v=>{ if(my!==speakToken) return; if(currentSpeakResolve){currentSpeakResolve=null;} resolve(v); };
     currentSpeakResolve=v=>done(v);
-    try{
-      speechSynthesis.cancel();
-      const u=new SpeechSynthesisUtterance(text);
-      u.rate=rate||1;
-      u.onend=()=>done({ok:true}); u.onerror=()=>done({ok:false});
-      speechSynthesis.speak(u);
-      setTimeout(()=>done({ok:true}), Math.min(30000, Math.max(9000, text.length*220)));
-    }catch(e){ done({ok:false}); }
+    (async()=>{
+      try{
+        const b64=await ttsFetch(script||roman);
+        if(my!==speakToken) return; // cancelled while fetching
+        done(await playWav(b64));
+      }catch(e){
+        if(my!==speakToken) return;
+        done(await speakDevice(roman,rate));
+      }
+    })();
   });
+}
+
+/* split Bhalu's JSON reply into {show: Roman for screen, speak: Urdu script for voice} */
+function parsePartner(raw){
+  try{
+    const m=String(raw).match(/\{[\s\S]*\}/);
+    if(m){
+      const o=JSON.parse(m[0]);
+      if(o&&typeof o.show==="string"&&o.show.trim())
+        return {show:o.show.trim(),
+                speak:(typeof o.speak==="string"&&o.speak.trim())?o.speak.trim():o.show.trim()};
+    }
+  }catch(e){}
+  return {show:String(raw),speak:""};
 }
 
 /* ================= voice: STT ================= */
@@ -671,27 +774,27 @@ async function userTurn(){
     session.consecEmpty=(session.consecEmpty||0)+1;
     if(session.pressure){
       session.freezes++; setMood("nervous"); setMic("speaking"); setStatus("Too slow — Bhalu jumps in! ⏰");
-      await speakUrdu(pick(NUDGES),cfg.tts);
+      const _n=pick(NUDGES); await speakUrdu(_n.roman,_n.script,cfg.tts);
       if(!session.active) return null;
       if(session.consecEmpty>=2){ session._askSimple=true; session.consecEmpty=0; }
     }else if(session.consecEmpty>=3){
       session.consecEmpty=0; setMic("speaking"); setMood("idle");
-      await speakUrdu(pick(GENTLE),cfg.tts);
+      const _g=pick(GENTLE); await speakUrdu(_g.roman,_g.script,cfg.tts);
       if(!session.active) return null;
     }
   }
   return null;
 }
 
-async function sessionLoop(firstPartnerText){
+async function sessionLoop(firstOpener){
   const cfg=DIFF[session.diff];
-  let partnerText=firstPartnerText;
+  let line={show:firstOpener.roman,speak:firstOpener.script};
   setMood("cheer");
   while(session.active){
-    addBubble("partner",partnerText);
+    addBubble("partner",line.show);
     setMic("speaking"); setMood("idle"); setStatus("Bhalu is speaking… 🐻");
     barged=false;
-    await speakUrdu(partnerText,cfg.tts);
+    await speakUrdu(line.show,line.speak,cfg.tts);
     if(!session.active) break;
     const userText=await userTurn();
     if(!session.active||userText===null) break;
@@ -705,16 +808,18 @@ async function sessionLoop(firstPartnerText){
     let sys=systemPrompt(session.scn,session.diff);
     if(session._askSimple){ sys+="\n\nIMPORTANT: The learner just froze twice in a row. Ask a VERY simple, easy question to get them talking again."; session._askSimple=false; }
     try{
-      partnerText=await geminiGenerate(sys,session.contents);
+      const raw=await geminiGenerate(sys,session.contents);
+      line=parsePartner(raw);
+      session.contents.push({role:"model",parts:[{text:raw}]});
     }catch(e){
       $("typing").classList.remove("on");
       setStatus(geminiErrorMsg(e)); setMood("nervous");
       await sleep(2600);
       if(!session.active) break;
-      partnerText="Maaf kijiye, main samajh nahin saka. Phir se kahiye?";
+      line={show:FALLBACK.roman,speak:FALLBACK.script};
+      session.contents.push({role:"model",parts:[{text:JSON.stringify(line)}]});
     }
     $("typing").classList.remove("on");
-    session.contents.push({role:"model",parts:[{text:partnerText}]});
   }
 }
 
@@ -732,7 +837,7 @@ async function startSession(){
   await sleep(900);
   if(!session.active) return;
   const opener=pick(scn.openers);
-  session.contents.push({role:"model",parts:[{text:opener}]});
+  session.contents.push({role:"model",parts:[{text:JSON.stringify({speak:opener.script,show:opener.roman})}]});
   await sessionLoop(opener);
 }
 
@@ -891,7 +996,7 @@ function init(){
     startSession();
   };
   $("btn-end-session").onclick=()=>{ if(confirm("End this session early?")) endSession(); };
-  $("btn-voice-test").onclick=()=>{ speakUrdu("Assalam-o-Alaikum! Main Bhalu hoon. Kya tum taiyaar ho?",1); };
+  $("btn-voice-test").onclick=()=>{ speakUrdu("Assalam-o-Alaikum! Main Bhalu hoon. Kya tum taiyaar ho?","اسلام علیکم! میں بھالو ہوں۔ کیا تم تیار ہو؟",1); };
   $("mic-btn").onclick=()=>{
     if(!session||!session.active) return;
     if(micMode==="speaking"){ barged=true; stopSpeaking(); }
