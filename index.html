@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#FFF7EC">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="app-version" content="0.0.1">
+<meta name="app-version" content="0.0.2">
 <title>Bhalu — Urdu Speaking Trainer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -191,6 +191,8 @@ input[type=range]::-moz-range-thumb{width:28px; height:28px; border-radius:50%; 
 /* misc */
 .warn{background:#FFF3C4; border-radius:16px; padding:12px 14px; font-size:14px; font-weight:700; color:#8a6d1a; margin:12px 0; display:none}
 .warn.on{display:block}
+.mic-line{font-size:14px; font-weight:600; padding:6px 0; border-bottom:1px dashed #F0E4D4}
+.mic-line.good{color:#1e7e4f}.mic-line.bad{color:#b3261e}
 .tiny{font-size:12px; color:var(--ink-soft); font-weight:600; text-align:center; margin-top:10px; line-height:1.5}
 .mt{margin-top:14px}
 .hidden{display:none!important}
@@ -265,7 +267,13 @@ input[type=range]::-moz-range-thumb{width:28px; height:28px; border-radius:50%; 
 
   <button class="btn" id="btn-start-session">Let's talk! 🎙️</button>
   <button class="btn ghost mt" id="btn-voice-test">🔊 Hear Bhalu's voice</button>
+  <button class="btn ghost mt" id="btn-mic-test">🎤 Test my microphone</button>
   <div class="warn" id="home-warn"></div>
+  <div class="card" id="mic-card" style="display:none">
+    <h2>Microphone test 🎤</h2>
+    <p class="sub" style="font-size:13px">This checks each step and shows exactly what your iPhone reports.</p>
+    <div id="mic-log"></div>
+  </div>
 
   <div class="card">
     <div class="row spread"><h2>Your progress 📈</h2><span class="pill" id="history-count" style="font-size:13px">0 sessions</span></div>
@@ -567,11 +575,14 @@ function speakUrdu(roman,script,rate){
     currentSpeakResolve=v=>done(v);
     (async()=>{
       try{
+        setStatus("Bhalu is finding his voice… 💭");
         const b64=await ttsFetch(script||roman);
         if(my!==speakToken) return; // cancelled while fetching
+        setStatus("Bhalu is speaking… 🐻");
         done(await playWav(b64));
       }catch(e){
         if(my!==speakToken) return;
+        setStatus("Bhalu is speaking… 🐻");
         done(await speakDevice(roman,rate));
       }
     })();
@@ -623,7 +634,56 @@ function listenTurn(onFirstSpeech){
   });
 }
 
-/* ================= Gemini ================= */
+/* Step-by-step mic diagnostic shown on the home screen. */
+async function micTest(){
+  const card=$("mic-card"), log=$("mic-log");
+  card.style.display="block"; log.innerHTML="";
+  card.scrollIntoView({behavior:"smooth",block:"nearest"});
+  const line=(t,cls)=>{ const d=document.createElement("div"); d.className="mic-line"+(cls?" "+cls:""); d.textContent=t; log.appendChild(d); };
+  if(!SR){ line("❌ This browser has no voice recognition. Open this page in Safari on your iPhone.","bad"); return; }
+  line("✅ Voice recognition is available in this browser.","good");
+  line("🎤 Asking for microphone access… (watch for the iPhone prompt)");
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    stream.getTracks().forEach(t=>t.stop());
+    line("✅ Microphone access granted.","good");
+  }catch(e){
+    line("❌ Microphone blocked ("+(e&&e.name||"error")+").","bad");
+    line("Fix: iPhone Settings → Apps → Safari → Microphone → Allow. Then reload this page and test again.","bad");
+    return;
+  }
+  line("🗣️ Say something in Urdu — listening for 10 seconds…");
+  await new Promise(resolve=>{
+    let done=false, got=false;
+    const fin=()=>{ if(!done){done=true; resolve();} };
+    try{
+      const r=new SR();
+      r.lang="ur-PK"; r.interimResults=true; r.continuous=false; r.maxAlternatives=1;
+      r.onresult=ev=>{
+        let t="";
+        for(const res of ev.results) t+=res[0].transcript+" ";
+        t=t.trim();
+        if(t&&!got){ got=true; line("✅ Heard you: “"+t+"”","good"); }
+      };
+      r.onerror=ev=>{ line("⚠️ Recognition reported: "+(ev.error||"error"),"bad"); fin(); };
+      r.onend=()=>{ if(!got) line("⚠️ Listening stopped without hearing anything.","bad"); fin(); };
+      r.start();
+      setTimeout(()=>{ try{r.stop();}catch(e){} fin(); },10000);
+    }catch(e){ line("❌ Could not start recognition: "+(e&&e.message||e),"bad"); fin(); }
+  });
+  const heard=[...log.children].some(d=>d.textContent.startsWith("✅ Heard"));
+  line(heard?"🎉 Your mic works! Start a session and talk away.":"Test finished — nothing was heard. If the microphone step passed, try again speaking louder and closer to the phone.","good");
+}
+
+function micErrorMsg(code){
+  if(code==="not-allowed"||code==="service-not-allowed")
+    return "🚫 Mic blocked. iPhone Settings → Apps → Safari → Microphone → Allow, then reload this page.";
+  if(code==="language-not-supported")
+    return "This iPhone can't do Urdu voice typing. Tell Bhalu (on the home screen mic test) what you saw.";
+  if(code==="network") return "Voice typing needs internet — check your connection.";
+  if(code==="aborted") return "Listening was interrupted — trying again… 🎤";
+  return "Mic trouble ("+code+") — trying again… 🎤";
+}
 const MODELS=["gemini-2.5-flash","gemini-flash-latest"];
 async function geminiFetch(model,body){
   const key=store.key;
@@ -769,8 +829,8 @@ async function userTurn(){
       return res.text.trim();
     }
     if(res.error){
-      setStatus("Mic trouble — trying again… 🎤"); setMood("nervous");
-      await sleep(2200); continue;
+      setStatus(micErrorMsg(res.error)); setMood("nervous");
+      await sleep(2600); continue;
     }
     session.consecEmpty=(session.consecEmpty||0)+1;
     if(session.pressure){
@@ -998,6 +1058,7 @@ function init(){
   };
   $("btn-end-session").onclick=()=>{ if(confirm("End this session early?")) endSession(); };
   $("btn-voice-test").onclick=()=>{ speakUrdu("Assalam-o-Alaikum! Main Bhalu hoon. Kya tum taiyaar ho?","اسلام علیکم! میں بھالو ہوں۔ کیا تم تیار ہو؟",1); };
+  $("btn-mic-test").onclick=()=>{ micTest(); };
   $("mic-btn").onclick=()=>{
     if(!session||!session.active) return;
     if(micMode==="speaking"){ barged=true; stopSpeaking(); }
